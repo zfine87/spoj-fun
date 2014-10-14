@@ -14,24 +14,37 @@ def prime_read (r) :
     except ValueError:
         return []
 
+def prime_write(w, l) :
+    for i in range(0, len(l)-1):
+        if l[i] == "":
+            i += 1
+        w.write(l[i] + "\n")
+
+
 def prime_solve (r, w) :
     """
     r a reader
     w a writer
     """
+    count = 0
     z = int(1000000000**.5)+1
-    r.readline()
-    while True :
+    num_tests = int(r.readline())
+    while count <= num_tests :
         start_set = basic_sieve(z)
         l = prime_read(r)
         if not l :
             break
-        if l[1] < z:
-            for i in range (l[0], l[1]):
+        if l[1] <= z:
+            for i in range (l[0], l[1]+1):
                 if start_set[i]:
-                    print(i)
-        else: 
-            sieve(l[0], l[1], start_set)
+                    w.write(str(i) + "\n")
+        elif l[0] <= z:
+            for i in range (l[0], z):
+                if start_set[i]:
+                    w.write(str(i) + "\n")
+            sieve(z, l[1], start_set, w)            
+        else:
+            sieve(l[0], l[1], start_set, w)
         print()
 
 def subset_check(b, e) :
@@ -46,18 +59,9 @@ def prime_eval(n, d):
     for each in range(0, d):
         if each :
             print(n[each] + d)
-    # if n % 2 == 0 or n % 3 == 0:
-    #     unprime_set.add(n)
-    #     return False
-    # for i in range(5, int(n ** 0.5) + 1, 6):
-    #     if n % i == 0 or n % (i + 2) == 0:
-    #         unprime_set.add(n)
-    #         return False
-    # prime_set.add(n)
-    # return True
 
 
-def sieve(l, r, s):
+def sieve(l, r, s, w):
     if l % 2:
         l -= 1
     if r % 2:
@@ -65,9 +69,6 @@ def sieve(l, r, s):
     count = 0
     p = []
     q = []
-    # b = (r-l) // 10
-    # if b < 10:
-    #     b = r-l
     b = 100
     for i in range (3, int(r**.5)):
         if s[i]: 
@@ -75,7 +76,6 @@ def sieve(l, r, s):
     for each in p:
         q.append(int((-1/2*(l+1+each)) % each))
     for bl in range(l, r, b*2):
-        #if not count % 2 and count > 0:
         bits = [1]*b
         for x in range(0, len(p)):
             for y in range(q[x], len(bits), p[x]):
@@ -83,11 +83,9 @@ def sieve(l, r, s):
         for i in range(0, len(bits)):
             if bits[i]:
                 if (i*2+1+bl) >= l and (i*2+1+bl) <= r:
-                    print(i*2+1+bl)
-        #count += 1
+                    w.write(str(i*2+1+bl) + "\n")
         for i in range (0, len(q)):
             q[i] = (q[i] - b) % p[i]
-
 
 def basic_sieve(n) :
     nums = [1] * n
